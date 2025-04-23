@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import html2pdf from "html2pdf.js";
 import emailjs from "emailjs-com";
-import html2pdf from "html2pdf.js";
 
 const PreviewPage = () => {
   const [invoice, setInvoice] = useState(null);
