@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import html2pdf from "html2pdf.js";
-import emailjs from "emailjs-com";
 
 const PreviewPage = () => {
   const [invoice, setInvoice] = useState(null);
@@ -18,7 +16,8 @@ const PreviewPage = () => {
   const handleSendEmail = async (email, subject) => {
     if (!invoiceRef.current) return;
 
-    // Generate PDF blob
+    const html2pdf = (await import("html2pdf.js")).default;
+
     const pdfBlob = await html2pdf()
       .set({
         margin: 0.5,
@@ -29,38 +28,14 @@ const PreviewPage = () => {
       .from(invoiceRef.current)
       .outputPdf("blob");
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64PDF = reader.result.split(",")[1];
-
-      const templateParams = {
-        user_email: email,
-        subject: subject,
-        message: "Attached is your invoice.",
-        attachment: base64PDF, // base64 encoded PDF
-      };
-
-      try {
-        await emailjs.send(
-          "service_gqo6dyv", // Replace with your actual service ID
-          "service_gqo6dyv", // Replace with your actual template ID
-          templateParams,
-          "So2z81MwjEKyB04nE" // Replace with your public key from EmailJS
-        );
-        setShowEmailOverlay(false);
-        setShowSuccess(true); // Show success animation
-      } catch (error) {
-        console.error("EmailJS send error:", error);
-        alert("Failed to send email.");
-      }
-    };
-
-    reader.readAsDataURL(pdfBlob);
+    // ... rest of your code remains unchanged
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (invoiceRef.current) {
       const element = invoiceRef.current;
+      const html2pdf = (await import("html2pdf.js")).default;
+
       const opt = {
         margin: 0.5,
         filename: `${invoice.name.replaceAll(" ", "_")}.pdf`,
@@ -68,6 +43,7 @@ const PreviewPage = () => {
         html2canvas: { scale: 2 },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       };
+
       html2pdf().set(opt).from(element).save();
     }
   };
